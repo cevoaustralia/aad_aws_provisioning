@@ -10,22 +10,22 @@ from provisioner.ad_helpers import approles
 
 def main(args):
     "Let's make us some roles!"
-    print ("Adding SAML provider to Account...")
+    print("Adding SAML provider to Account...")
     saml_provider_arn = saml.add_saml_provider(args.saml_metadata, args.provider_name)
-    print ("Identity Provider created: {}".format(saml_provider_arn))
-    print ("Adding Role to account...")
+    print("Identity Provider created: {}".format(saml_provider_arn))
+    print("Adding Role to account...")
     trust_role_arn = roles.add_trust_role(args.role_template,
                                           saml_provider_arn,
                                           args.role_name,
                                           args.role_description)
-    print ("Trust role created: {}".format(trust_role_arn))
-    print ("Generating appRoles JSON blob...")
+    print("Trust role created: {}".format(trust_role_arn))
+    print("Generating appRoles JSON blob...")
     approles_blob = approles.generate_ad_role(args.role_name,
                                               args.role_description,
                                               trust_role_arn,
                                               saml_provider_arn)
-    print ("appRoles json generated:")
-    print (json.dumps(approles_blob, sort_keys=True, indent=4))
+    print("appRoles json generated:")
+    print(json.dumps(approles_blob, sort_keys=True, indent=4))
 
 
 if __name__ == "__main__":
