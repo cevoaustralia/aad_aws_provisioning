@@ -18,9 +18,10 @@ def add_saml_provider(metadata_file_name, saml_provider_name):
     except ClientError as client_error:
         if client_error.response['Error']['Code'] == 'EntityAlreadyExists':
             print("SAML provider already exists...")
-            return lookup_saml_provider(saml_provider_name)
+            return None
         else:
             print("There was an error creating the SAML provider: " + str(client_error))
+            return None
 
 
 def lookup_saml_provider(saml_provider_name):
