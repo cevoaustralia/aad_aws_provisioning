@@ -11,8 +11,13 @@ from provisioner.ad_helpers import approles
 def main(args):
     "Let's make us some roles!"
     print("Adding SAML provider to Account...")
-    saml_provider_arn = saml.add_saml_provider(args.saml_metadata, args.provider_name)
-    print("Identity Provider created: {}".format(saml_provider_arn))
+    saml_provider_arn = None
+    try:
+        saml_provider_arn = saml.add_saml_provider(args.saml_metadata, args.provider_name)
+    except saml.SAMLProviderExistsError:
+        print("SAML provider {} already exists. Looking up ARN...".format(args.provider_name))
+        saml_provider_arn = saml.lookup_saml_provider(args.provider_name)
+    print("Identity Provider: {}".format(saml_provider_arn))
     print("Adding Role to account...")
     trust_role_arn = roles.add_trust_role(args.role_template,
                                           saml_provider_arn,
