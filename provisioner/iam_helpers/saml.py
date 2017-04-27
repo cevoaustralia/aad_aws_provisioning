@@ -32,11 +32,6 @@ def lookup_saml_provider(saml_provider_name):
         print("Unable to retrieve list of SAML providers: " + str(client_error))
         raise
     else:
-        provider_arn = None
         for prov in saml_providers['SAMLProviderList']:
             if saml_provider_name in prov['Arn']:
-                provider_arn = prov['Arn']
-                break
-        else:
-            raise ValueError("Couldn't find ARN of SAML Provider " + saml_provider_name)
-        return provider_arn
+                return prov['Arn']
