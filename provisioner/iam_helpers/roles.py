@@ -4,7 +4,7 @@ Utility functions for AWS IAM role-based activities
 import json
 import boto3
 from botocore.exceptions import ClientError
-from .exceptions import TrustRoleExistsError
+from provisioner.exceptions import TrustRoleExistsError
 
 __iam_client__ = boto3.client('iam')
 

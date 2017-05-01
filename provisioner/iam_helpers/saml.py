@@ -3,7 +3,7 @@ Utility functions for dealing with AWS IAM SAML stuff
 """
 import boto3
 from botocore.exceptions import ClientError
-from .exceptions import SAMLProviderExistsError
+from provisioner.exceptions import SAMLProviderExistsError
 
 __iam_client__ = boto3.client('iam')
 
