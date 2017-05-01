@@ -3,7 +3,7 @@ Collection of functions for dealing with cloudformation stacks.
 """
 
 import boto3
-from botocore.exceptions import ClientError
+from botocore.exceptions import ClientError, WaiterError
 from provisioner.exceptions import StackExistsError
 
 __client__ = boto3.client("cloudformation", region_name="ap-southeast-2")
@@ -13,6 +13,7 @@ def create_stack(stack_name, template_path, parameters):
     Create a cloudformation stack in the current account
     """
     try:
+        complete_waiter = __client__.get_waiter('stack_create_complete')
         with open(template_path, 'r') as template_body:
             response = __client__.create_stack(
                 StackName=stack_name,
@@ -26,9 +27,16 @@ def create_stack(stack_name, template_path, parameters):
             )
             print(response)
 
+            print("Waiting for stack creation to complete...")
+            complete_waiter.wait(stack_name)
+
             return response['StackId']
     except FileNotFoundError:
         print("Unable to locate template file {}".format(template_path))
+        raise
+    except WaiterError as waiter_error:
+        print("Something went wrong creating the stack! {}".format(waiter_error))
+        # need to add some extra debug stuff here.
         raise
     except ClientError as client_error:
         print("Fooooo")
