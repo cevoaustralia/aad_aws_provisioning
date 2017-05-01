@@ -27,6 +27,16 @@ class TrustRoleExistsError(Error):
         self.trust_role = trust_role
         self.message = message
 
+class StackExistsError(Error):
+    """
+    Exception raised when a Cloudformation stack already exists in the AWS Account
+    """
+    def __init__(self, provider):
+        message = "Stack '{}' already exists in this account.".format(provider)
+        super().__init__(message)
+        self.provider = provider
+        self.message = message
+
 class InvalidTemplateError(Error):
     """
     Exception raised when a Cloudformation template is invalid
