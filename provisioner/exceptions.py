@@ -26,3 +26,16 @@ class TrustRoleExistsError(Error):
         super().__init__(message)
         self.trust_role = trust_role
         self.message = message
+
+class InvalidTemplateError(Error):
+    """
+    Exception raised when a Cloudformation template is invalid
+    """
+    def __init__(self, template_path, validation_message):
+        message = "Error validating template '{}':\n\n\t {}".format(
+            template_path,
+            validation_message
+            )
+        super().__init__(message)
+        self.template_path = template_path
+        self.validation_message = validation_message
