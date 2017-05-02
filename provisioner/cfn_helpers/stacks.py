@@ -80,6 +80,25 @@ def update_stack(stack_name, template_path, parameters):
             print("Error Updating Stack {}: {}".format(stack_name, client_error))
             raise
 
+def delete_stack(stack_name):
+    """
+    Delete a stack
+    """
+    try:
+        delete_waiter = __client__.get_waiter('stack_delete_complete')
+        response = __client__.delete_stack(StackName=stack_name)
+        print("Waiting for stack {} to be deleted...".format(stack_name))
+        delete_waiter.wait(StackName=stack_name)
+        return response
+    except WaiterError as waiter_error:
+        print("Something went wrong deleting the stack! {}".format(waiter_error))
+        print_stack_events(stack_name, 150)
+        raise
+    except ClientError as client_error:
+        print("Something went wrong deleting stack '{}': {}".format(stack_name, client_error))
+        raise
+
+
 def get_stack_events(stack_name):
     """
     Return a simplified dict of stack events
