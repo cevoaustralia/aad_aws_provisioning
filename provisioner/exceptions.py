@@ -49,3 +49,13 @@ class InvalidTemplateError(Error):
         super().__init__(message)
         self.template_path = template_path
         self.validation_message = validation_message
+
+
+class NoUpdateToPerformError(Error):
+    """
+    Exception raised when there is no update to perform during a stack update
+    """
+    def __init__(self, stack_name):
+        message = "Stack '{}' does not require updating.".format(stack_name)
+        super().__init__(message)
+        self.stack_name = stack_name

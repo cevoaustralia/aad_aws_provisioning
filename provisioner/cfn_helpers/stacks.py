@@ -5,7 +5,7 @@ Collection of functions for dealing with cloudformation stacks.
 from beautifultable import BeautifulTable
 import boto3
 from botocore.exceptions import ClientError, WaiterError
-from provisioner.exceptions import StackExistsError
+from provisioner.exceptions import StackExistsError, NoUpdateToPerformError
 
 __client__ = boto3.client("cloudformation", region_name="ap-southeast-2")
 
@@ -72,14 +72,18 @@ def update_stack(stack_name, template_path, parameters):
         print_stack_events(stack_name, 150)
         raise
     except ClientError as client_error:
-        print("Error Updating Stack {}: {}".format(stack_name, client_error))
-        raise
+        print("foo")
+        if client_error.response['Error']['Message'] == 'No updates are to be performed.':
+            print("Nothing to do on this stack!")
+            raise NoUpdateToPerformError(stack_name)
+        else:
+            print("Error Updating Stack {}: {}".format(stack_name, client_error))
+            raise
 
 def get_stack_events(stack_name):
     """
     Return a simplified dict of stack events
     """
-
     try:
         response = __client__.describe_stack_events(StackName=stack_name)
         events = []
