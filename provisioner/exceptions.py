@@ -1,5 +1,5 @@
 """
-Custom errors and exceptions for IAM helper functions
+Custom errors and errors for IAM helper functions
 """
 class Error(Exception):
     """
@@ -9,7 +9,7 @@ class Error(Exception):
 
 class SAMLProviderExistsError(Error):
     """
-    Exception raised when the SAML Provider already exists in the AWS Account
+    Error raised when the SAML Provider already exists in the AWS Account
     """
     def __init__(self, provider):
         message = "SAML Provider '{}' already exists in this account.".format(provider)
@@ -19,7 +19,7 @@ class SAMLProviderExistsError(Error):
 
 class TrustRoleExistsError(Error):
     """
-    Exception raised when the trust role already exists in the AWS Account
+    Error raised when the trust role already exists in the AWS Account
     """
     def __init__(self, trust_role):
         message = "Trust role '{}' already exists in this account.".format(trust_role)
@@ -29,7 +29,7 @@ class TrustRoleExistsError(Error):
 
 class StackExistsError(Error):
     """
-    Exception raised when a Cloudformation stack already exists in the AWS Account
+    Error raised when a Cloudformation stack already exists in the AWS Account
     """
     def __init__(self, provider):
         message = "Stack '{}' already exists in this account.".format(provider)
@@ -39,7 +39,7 @@ class StackExistsError(Error):
 
 class InvalidTemplateError(Error):
     """
-    Exception raised when a Cloudformation template is invalid
+    Error raised when a Cloudformation template is invalid
     """
     def __init__(self, template_path, validation_message):
         message = "Error validating template '{}':\n\n\t {}".format(
@@ -53,7 +53,7 @@ class InvalidTemplateError(Error):
 
 class NoUpdateToPerformError(Error):
     """
-    Exception raised when there is no update to perform during a stack update
+    Error raised when there is no update to perform during a stack update
     """
     def __init__(self, stack_name):
         message = "Stack '{}' does not require updating.".format(stack_name)
