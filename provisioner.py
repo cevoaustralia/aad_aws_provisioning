@@ -54,8 +54,8 @@ def main(args):
     print("Looking up role ARN...")
     try:
         role_data = roles.look_up_role(role_name)
-        print("Role Found: {}".format(role_data))
         trust_role_arn = role_data['Role']['Arn']
+        print("Role Found: {}".format(trust_role_arn))
     except RoleNotFoundError:
         print("Couldn't find role {}".format(role_name))
         raise

@@ -39,7 +39,7 @@ def create_stack(stack_name, template_path, parameters):
         raise
     except ClientError as client_error:
         if client_error.response['Error']['Code'] == 'AlreadyExistsException':
-            print("SAML provider already exists...")
+            print("Cloudformation Stack '{}' already exists...".format(stack_name))
             raise StackExistsError(stack_name)
         else:
             print("There was an error validating the template: " + str(client_error))
@@ -72,9 +72,8 @@ def update_stack(stack_name, template_path, parameters):
         print_stack_events(stack_name, 150)
         raise
     except ClientError as client_error:
-        print("foo")
         if client_error.response['Error']['Message'] == 'No updates are to be performed.':
-            print("Nothing to do on this stack!")
+            print("Stack '{}' is up to date with template '{}'".format(stack_name, template_path))
             raise NoUpdateToPerformError(stack_name)
         else:
             print("Error Updating Stack {}: {}".format(stack_name, client_error))
