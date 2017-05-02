@@ -24,7 +24,7 @@ def main(args):
         saml_provider_arn = saml.add_saml_provider(args.saml_metadata, args.provider_name)
     except SAMLProviderExistsError:
         print("SAML provider {} already exists. Looking up ARN...".format(args.provider_name))
-        saml_provider_arn = saml.lookup_saml_provider(args.provider_name)
+        saml_provider_arn = saml.look_up_saml_provider(args.provider_name)
     print("Identity Provider: {}".format(saml_provider_arn))
 
     print("Adding Role to account...")
