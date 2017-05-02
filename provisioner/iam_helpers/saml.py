@@ -24,14 +24,11 @@ def add_saml_provider(metadata_file_name, saml_provider_name):
             print("There was an error creating the SAML provider: " + str(client_error))
             raise
 
-def lookup_saml_provider(saml_provider_name):
+def lookup_saml_provider(saml_provider_arn):
     "look up the ARN of a SAML provider based on it's name"
     try:
-        saml_providers = __iam_client__.list_saml_providers()
+        response = __iam_client__.get_saml_provider(SAMLProviderArn=saml_provider_arn)
+        return response
     except ClientError as client_error:
         print("Unable to retrieve list of SAML providers: " + str(client_error))
         raise
-    else:
-        for prov in saml_providers['SAMLProviderList']:
-            if saml_provider_name in prov['Arn']:
-                return prov['Arn']
