@@ -45,6 +45,36 @@ def create_stack(stack_name, template_path, parameters):
             print("There was an error validating the template: " + str(client_error))
             raise
 
+def update_stack(stack_name, template_path, parameters):
+    """
+    Update an existing cloudformation stack
+    """
+    try:
+        update_waiter = __client__.get_waiter('stack_update_complete')
+        with open(template_path, 'r') as template_body:
+            response = __client__.update_stack(
+                StackName=stack_name,
+                TemplateBody=template_body.read(),
+                Parameters=parameters,
+                Capabilities=[
+                    'CAPABILITY_NAMED_IAM'
+                ]
+            )
+            print(response)
+            print("Waiting for stack {} to update...".format(stack_name))
+            update_waiter.wait(StackName=stack_name)
+            return response
+    except FileNotFoundError:
+        print("Unable to locate template file {}".format(template_path))
+        raise
+    except WaiterError as waiter_error:
+        print("Something went wrong updating the stack! {}".format(waiter_error))
+        print_stack_events(stack_name, 150)
+        raise
+    except ClientError as client_error:
+        print("Error Updating Stack {}: {}".format(stack_name, client_error))
+        raise
+
 def get_stack_events(stack_name):
     """
     Return a simplified dict of stack events

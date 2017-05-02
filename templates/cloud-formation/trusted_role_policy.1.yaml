@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: "2010-09-09"
+
+Parameters:
+  RoleName:
+    Type: String
+    Description: Name of the role
+  SAMLProviderARN:
+    Type: String
+    Description: ARN of the SAML IdP prviding federated identity management
+
+Resources:
+  FederatedRole:
+    Type: AWS::IAM::Role
+    Properties:
+      RoleName: !Ref RoleName
+      Path: "/"
+      AssumeRolePolicyDocument:
+        Version: "2012-10-17"
+        Statement: 
+          -
+            Effect: "Allow"
+            Action: "sts:AssumeRoleWithSAML"
+            Principal:
+              Federated: !Ref SAMLProviderARN 
+            Condition:
+              StringEquals:
+                SAML:aud: "https://signin.aws.amazon.com/saml"
+
+  EC2ReadOnlyPolicy:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyName: !Join [ "-", [ !Ref RoleName, "policy"] ]
+      Roles:
+        - !Ref FederatedRole
+      PolicyDocument:
+        Version: "2012-10-17"
+        Statement:
+          -
+            Effect: Allow
+            Action: "ec2:Describe*"
+            Resource: "*"
+          -
+            Effect: Allow
+            Action: "elasticloadbalancing:Describe*"
+            Resource: "*"
+          - 
+            Effect: Allow
+            Action: 
+              - cloudwatch:ListMetrics
+              - cloudwatch:GetMetricStatistics
+              - "cloudwatch:Describe*"
+            Resource: "*"
