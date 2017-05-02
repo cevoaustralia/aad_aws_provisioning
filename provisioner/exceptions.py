@@ -27,6 +27,15 @@ class TrustRoleExistsError(Error):
         self.trust_role = trust_role
         self.message = message
 
+class RoleNotFoundError(Error):
+    """
+    Error raised when we can't find a role we look up
+    """
+    def __init__(self, role_name):
+        message = "Could not find role {}".format(role_name)
+        super().__init__(message)
+        self.role_name = role_name
+
 class StackExistsError(Error):
     """
     Error raised when a Cloudformation stack already exists in the AWS Account
