@@ -5,13 +5,13 @@ import boto3
 from botocore.exceptions import ClientError
 from provisioner.exceptions import SAMLProviderExistsError
 
-__iam_client__ = boto3.client('iam')
+__client__ = boto3.client('iam')
 
 def add_saml_provider(metadata_file_name, saml_provider_name):
     "Creates a new SAML IdP provider in the current account"
     metadata = open(metadata_file_name, 'rU').read()
     try:
-        response = __iam_client__.create_saml_provider(
+        response = __client__.create_saml_provider(
             SAMLMetadataDocument=metadata,
             Name=saml_provider_name
         )
@@ -24,11 +24,24 @@ def add_saml_provider(metadata_file_name, saml_provider_name):
             print("There was an error creating the SAML provider: " + str(client_error))
             raise
 
-def look_up_saml_provider(saml_provider_arn):
+def look_up_saml_provider(saml_provider_name):
     "look up the ARN of a SAML provider based on it's name"
     try:
-        response = __iam_client__.get_saml_provider(SAMLProviderArn=saml_provider_arn)
-        return response
+        saml_providers = __client__.list_saml_providers()
     except ClientError as client_error:
         print("Unable to retrieve list of SAML providers: " + str(client_error))
+        raise
+    else:
+        for prov in saml_providers['SAMLProviderList']:
+            if saml_provider_name in prov['Arn']:
+                return prov['Arn']
+
+def delete_saml_provider(saml_provider_arn):
+    "delete a saml provider"
+    try:
+        print("Deleting SAML provider '{}'".format(saml_provider_arn))
+        response = __client__.delete_saml_provider(SAMLProviderArn=saml_provider_arn)
+        return response
+    except ClientError as client_error:
+        print("Error deleting SAML provider '{}': {}".format(saml_provider_arn, client_error))
         raise
