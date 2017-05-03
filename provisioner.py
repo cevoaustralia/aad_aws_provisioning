@@ -74,16 +74,14 @@ if __name__ == "__main__":
     __parser__ = argparse.ArgumentParser(description="Set up AWS account for SAML auth")
     __parser__.add_argument('-m --saml_metadata',
                             type=str,
+                            required=True,
                             help='file containing AD cert metadata',
                             dest='saml_metadata')
     __parser__.add_argument('-c --cfn-template',
                             type=str,
+                            required=True,
                             help='path to cloudformation templates specifying role and policy doc',
                             dest='template_path')
-    __parser__.add_argument('-t --role_template',
-                            type=str,
-                            help='file containing the template for the role',
-                            dest='role_template')
     __parser__.add_argument('-s --stack_name',
                             type=str,
                             help='name of the cloudformation stack',
