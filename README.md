@@ -6,7 +6,7 @@ A collection of helper functions and a sample script to provision a SAML Provide
  Helper functions for: 
 - creating/finding/deleting a SAML provider via API calls
 - creating/finding an IAM role via API calls
-- creating/finding/deleting clou
+- creating/finding/deleting cloudformation stacks
 - generating the role json to paste into the AWS application manifest in Active Directory
 
 ### Note: 
