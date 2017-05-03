@@ -1,7 +1,9 @@
 # Provisioning AWS SSO talking to Azure Active Directory
 A collection of helper functions and a sample script to provision a SAML Provider and an associated role to AWS
 
-Contains helper functions for: 
+(For provisioning a SAML Provider in AWS through cloudformation directly see @nonspecialist's repo here: <https://github.com/cevoaustralia/cfn-identity-provider>)
+
+ Helper functions for: 
 - creating/finding/deleting a SAML provider via API calls
 - creating/finding an IAM role via API calls
 - creating/finding/deleting clou
@@ -10,7 +12,9 @@ Contains helper functions for:
 ### Note: 
 This only covers the AWS side of the SAML Provider provisioning. 
 
-## provisioner.py
+## Demo Scripts 
+
+### provisioner.py
 A demo script for provisioning a SAML Provider and A cloudfromation stack to define a trust role.
 
 You can provide any cloudfromation template you like. 
@@ -48,7 +52,7 @@ optional arguments:
                         description to assign to the role created
 ```
 
-## deprovisioner.py
+### deprovisioner.py
 A script to tear down the stack and SAML provider created by `provisioner.py`
 
 ```
