@@ -23,7 +23,6 @@ def process_params(params_file, saml_provider_arn, role_name):
     """
     params = json.load(open(params_file, 'r'))
     for param in params:
-        print(param)
         if 'SAMLProviderARN' in param['ParameterKey']:
             param['ParameterValue'] = saml_provider_arn
         if 'RoleName' in param['ParameterKey']:
