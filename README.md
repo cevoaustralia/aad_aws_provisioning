@@ -1,7 +1,7 @@
 # Provisioning AWS SSO talking to Azure Active Directory
 A collection of helper functions and a sample script to provision a SAML Provider and an associated role to AWS
 
-(For provisioning a SAML Provider in AWS through cloudformation directly see colin Panisset's repo here: <https://github.com/cevoaustralia/cfn-identity-provider>)
+(For provisioning a SAML Provider in AWS through cloudformation directly see Colin Panisset's repo here: <https://github.com/cevoaustralia/cfn-identity-provider>)
 
  Helper functions for: 
 - creating/finding/deleting a SAML provider via API calls
