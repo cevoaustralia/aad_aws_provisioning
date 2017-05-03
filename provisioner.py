@@ -13,6 +13,23 @@ from provisioner.exceptions import (SAMLProviderExistsError,
                                     RoleNotFoundError)
 from provisioner.ad_helpers import approles
 
+def process_params(params_file, saml_provider_arn, role_name):
+    """
+    Process the parameters json file and returns a dict with the results.
+
+    Will set a property key of `SAMLProviderARN` to whatever saml_provider_arn is passed in
+
+    Will set a property key of `RoleName` to whatever role_name is passed in
+    """
+    params = json.load(open(params_file, 'r'))
+    for param in params:
+        print(param)
+        if 'SAMLProviderARN' in param['ParameterKey']:
+            param['ParameterValue'] = saml_provider_arn
+        if 'RoleName' in param['ParameterKey']:
+            param['ParameterValue'] = role_name
+    return params
+
 def main(args):
     "Let's make us some roles!"
     print("Adding SAML provider to Account...")
@@ -20,6 +37,7 @@ def main(args):
     stack_name = args.stack_name
     role_name = args.role_name
     template_path = args.template_path
+    params_file = args.params_file
     try:
         saml_provider_arn = saml.add_saml_provider(args.saml_metadata, args.provider_name)
     except SAMLProviderExistsError:
@@ -29,16 +47,7 @@ def main(args):
 
     print("Adding Role to account...")
     try:
-        parameters = [
-            {
-                "ParameterKey": "SAMLProviderARN",
-                "ParameterValue": saml_provider_arn
-            },
-            {
-                "ParameterKey": "RoleName",
-                "ParameterValue": role_name
-            }
-        ]
+        parameters = process_params(params_file, saml_provider_arn, role_name)
         print("Validating template '{}'".format(template_path))
         validate_template(template_path)
         stack_id = create_stack(stack_name, template_path, parameters)
@@ -77,11 +86,15 @@ if __name__ == "__main__":
                             required=True,
                             help='file containing AD cert metadata',
                             dest='saml_metadata')
-    __parser__.add_argument('-c --cfn-template',
+    __parser__.add_argument('-t --cfn_template',
                             type=str,
                             required=True,
-                            help='path to cloudformation templates specifying role and policy doc',
+                            help='path to cloudformation template',
                             dest='template_path')
+    __parser__.add_argument('-p --cfn_parameters',
+                            type=str,
+                            help='path to cloudformation parameters file',
+                            dest='params_file')
     __parser__.add_argument('-s --stack_name',
                             type=str,
                             help='name of the cloudformation stack',
