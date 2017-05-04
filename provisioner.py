@@ -19,11 +19,11 @@ def setup_logger():
     Set up all the stuff to get the logger configured and working
     """
     logger = logging.getLogger('provisioner')
-    logger.setLevel(logging.DEBUG)
+    logger.setLevel(logging.INFO)
     console_handler = logging.StreamHandler()
     formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
     console_handler.setFormatter(formatter)
-    console_handler.setLevel(logging.DEBUG)
+    console_handler.setLevel(logging.INFO)
     logger.addHandler(console_handler)
     return logger
 
