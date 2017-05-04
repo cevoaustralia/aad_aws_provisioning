@@ -1,11 +1,13 @@
 """
 Utility functions for AWS IAM role-based activities
 """
+import logging
 import json
 import boto3
 from botocore.exceptions import ClientError
 from provisioner.exceptions import TrustRoleExistsError, RoleNotFoundError
 
+__logger__ = logging.getLogger(__name__)
 __iam_client__ = boto3.client('iam')
 
 def add_trust_role(federated_role_template_file, saml_provider_arn, role_name, role_description):
@@ -21,14 +23,14 @@ def add_trust_role(federated_role_template_file, saml_provider_arn, role_name, r
         )
         return response["Role"]["Arn"]
     except FileNotFoundError:
-        print("Unable to locate template file {}".format(federated_role_template_file))
+        __logger__.error("Unable to locate template file %s", federated_role_template_file)
         raise
     except ClientError as client_error:
         if client_error.response['Error']['Code'] == 'EntityAlreadyExists':
-            print("SAML provider already exists...")
+            __logger__.warning("SAML provider already exists...")
             raise TrustRoleExistsError(role_name)
         else:
-            print("Something went wrong creating the Trust Role: {}". format(client_error))
+            __logger__.error("Something went wrong creating the Trust Role: %s", client_error)
             raise
 
 def look_up_role(role_name):
@@ -40,8 +42,8 @@ def look_up_role(role_name):
         return response
     except ClientError as client_error:
         if client_error.response['Error']['Code'] == 'NoSuchEntity':
-            print("Role '{}' not found...".format(role_name))
+            __logger__.warning("Role '%s' not found...", role_name)
             raise RoleNotFoundError(role_name)
         else:
-            print("Unable to find role {}: {}".format(role_name, client_error))
+            __logger__.error("Unable to find role %s: %s", role_name, client_error)
             raise

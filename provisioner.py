@@ -3,6 +3,7 @@ Creates a SAML provider and associated trust role with no attached policies in t
 Also creates a json blob to paste in the AWS application manifest in AD
 """
 import json
+import logging
 
 from provisioner.iam_helpers import saml, roles
 from provisioner.cfn_helpers.stacks import create_stack, update_stack
@@ -12,6 +13,22 @@ from provisioner.exceptions import (SAMLProviderExistsError,
                                     StackExistsError,
                                     RoleNotFoundError)
 from provisioner.ad_helpers import approles
+
+def setup_logger():
+    """
+    Set up all the stuff to get the logger configured and working
+    """
+    logger = logging.getLogger('provisioner')
+    logger.setLevel(logging.DEBUG)
+    console_handler = logging.StreamHandler()
+    formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+    console_handler.setFormatter(formatter)
+    console_handler.setLevel(logging.DEBUG)
+    logger.addHandler(console_handler)
+    return logger
+
+__logger__ = setup_logger()
+
 
 def process_params(params_file, saml_provider_arn, role_name):
     """
@@ -27,11 +44,12 @@ def process_params(params_file, saml_provider_arn, role_name):
             param['ParameterValue'] = saml_provider_arn
         if 'RoleName' in param['ParameterKey']:
             param['ParameterValue'] = role_name
+    __logger__.debug("Parameters:\n %s", params)
     return params
 
 def main(args):
     "Let's make us some roles!"
-    print("Adding SAML provider to Account...")
+    __logger__.info("Adding SAML provider to Account...")
     saml_provider_arn = None
     stack_name = args.stack_name
     role_name = args.role_name
@@ -40,41 +58,41 @@ def main(args):
     try:
         saml_provider_arn = saml.add_saml_provider(args.saml_metadata, args.provider_name)
     except SAMLProviderExistsError:
-        print("SAML provider {} already exists. Looking up ARN...".format(args.provider_name))
+        __logger__.info("SAML provider %s already exists. Looking up ARN...", args.provider_name)
         saml_provider_arn = saml.look_up_saml_provider(args.provider_name)
-    print("Identity Provider: {}".format(saml_provider_arn))
+    __logger__.debug("Identity Provider: %s", saml_provider_arn)
 
-    print("Adding Role to account...")
+    __logger__.info("Adding Role to account...")
     try:
         parameters = process_params(params_file, saml_provider_arn, role_name)
-        print("Validating template '{}'".format(template_path))
+        __logger__.debug("Validating template '%s'", template_path)
         validate_template(template_path)
         stack_id = create_stack(stack_name, template_path, parameters)
-        print("Stack created. ID: {}".format(stack_id))
+        __logger__.info("Stack created. ID: %s", stack_id)
     except StackExistsError:
-        print("Stack {} already exists. Updating stack instead.".format(stack_name))
+        __logger__.info("Stack %s already exists. Updating stack instead.", stack_name)
         try:
             response = update_stack(stack_name, template_path, parameters)
-            print("Stack updated successfully. Response: {}".format(response))
+            __logger__.debug("Stack updated successfully. Response: %s", response)
         except NoUpdateToPerformError:
-            print("Stack does not require Updating.")
+            __logger__.debug("Stack does not require Updating.")
 
-    print("Looking up role ARN...")
+    __logger__.info("Looking up role ARN...")
     try:
         role_data = roles.look_up_role(role_name)
         trust_role_arn = role_data['Role']['Arn']
-        print("Role Found: {}".format(trust_role_arn))
+        __logger__.debug("Role Found: %s", trust_role_arn)
     except RoleNotFoundError:
-        print("Couldn't find role {}".format(role_name))
+        __logger__.warning("Couldn't find role %s", role_name)
         raise
 
-    print("Generating appRoles JSON blob...")
+    __logger__.info("Generating appRoles JSON blob...")
     approles_blob = approles.generate_ad_role(args.role_name,
                                               args.role_description,
                                               trust_role_arn,
                                               saml_provider_arn)
-    print("appRoles json generated:")
-    print(json.dumps(approles_blob, sort_keys=True, indent=4))
+    __logger__.debug("appRoles json generated:")
+    __logger__.info("\n%s", json.dumps(approles_blob, sort_keys=True, indent=4))
 
 
 if __name__ == "__main__":
